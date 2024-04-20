@@ -13,11 +13,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String    @id
+  firstName String
+  lastName  String
+  email     String
+  username  String    @default("NOT_SET")
+  linkTree  LinkTree?
+}
+
+model LinkTree {
+  id          String  @id @default(uuid())
+  description String?
+  links       Link[]
+  user        User    @relation(fields: [userId], references: [id])
+  userId      String  @unique
+}
+
 model Link {
-  id        String   @id @default(uuid())
-  label     String
-  link      String
-  position  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id             String    @id @default(uuid())
+  label          String
+  link           String
+  position       Int       @default(0)
+  enabled        Boolean   @default(true)
+  linkTreePageId String?
+  LinkTreePage   LinkTree? @relation(fields: [linkTreePageId], references: [id])
+  type           LinkType  @default(LINK)
+  icon           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now())
+}
+
+enum LinkType {
+  LINK
+  INSTAGRAM
+  WHATSAPP
+  TWITTER
 }
